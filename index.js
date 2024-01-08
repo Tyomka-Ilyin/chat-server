@@ -1,38 +1,72 @@
 let cors = require('cors')
-// import  ALLOWED_ORIGIN  from './config.js'
 
 const express = require('express');
+const { emit } = require('process');
 const { socket } = require('server/router');
+
 const app = express();
+app.set('view engine', 'ejs')
 
 const http = require('http').createServer(app);
 const io = require("socket.io")(http);
 
 const PORT = 3000
 
-app.get('/', (req, res) => {
-    res.send('hekkoofdg')
-})
-
+let users = []
 let messages = []
+
+app.get('/', (req, res) => {
+    res.render('index', {users: users, messages: messages});
+})
 
 io.on('connect', (socket) => {
     console.log('client connected')
-
-    // socket.on('addMe', (data) => {
-    //     this.users.push(data)
-    //     console.log(data)
-    // })
     
-    socket.emit('connected', messages)
+    var data = {
+        "users": users,
+        "messages": messages
+    }
+
+    socket.emit('connected', data)
 
     socket.on('message', (data) => {
         console.log(data.user + " " + data.message)
+        data.id = messages.length
         messages.push(data)
         io.emit('message', {
             user: data.user,
             message: data.message
         })
+    })
+
+    socket.on('addUser', (data) => {
+            var user = {
+                id: users.length,
+                userName: data.userName
+            }
+
+            users.push(user)
+            console.log("user added")
+
+            io.emit('newUser', user)
+    })
+
+    socket.on('removeClient', (data) => {
+        console.log("removeClient")
+        console.log(data.userName)
+
+        if(data.userName == ""){
+            return
+        }
+
+        for(var i = 0; i < users.length; i++){
+            if(users[i].userName == data.userName){
+                users.splice(i, 1)
+                console.log(data.userName + " deleted")
+
+                io.emit('removeUser', {id: i, userName: data.userName})
+            }
+        }
     })
 })
 

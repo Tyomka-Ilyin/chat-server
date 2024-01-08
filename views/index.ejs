@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server</title>
+</head>
+
+<style>
+nav ul{height:200px; width:10%;}
+nav ul{overflow:hidden; overflow-x:scroll; overflow-y:scroll;}
+</style>
+
+<body>
+    
+    <header>Подключенные пользователи</header>
+    <nav>
+        <ul>
+            <% users.forEach((el) => { %>
+                <li> <%= el.userName %> </li>
+            <% }) %>
+        </ul>
+    </nav>
+
+    <header>Сообщения</header>
+    <nav>
+        <ul>
+            <% messages.forEach((el) => { %>
+                <li> <%= el.user %>: <%= el.message %> </li>
+            <% }) %>
+        </ul>
+    </nav>
+
+    <button>Очистить</button>
+
+</body>
+</html>
